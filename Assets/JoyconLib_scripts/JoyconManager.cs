@@ -17,7 +17,7 @@ public class JoyconManager: MonoBehaviour
 	private const ushort product_l = 0x2006;
 	private const ushort product_r = 0x2007;
 
-    public List<Joycon> j; // Array of all connected Joy-Cons
+    public List<Joycon> allJoyCons; // Array of all connected Joy-Cons
     static JoyconManager instance;
 
     public static JoyconManager Instance
@@ -31,7 +31,7 @@ public class JoyconManager: MonoBehaviour
         instance = this;
 		int i = 0;
 
-		j = new List<Joycon>();
+		allJoyCons = new List<Joycon>();
 		bool isLeft = false;
 		HIDapi.hid_init();
 
@@ -64,7 +64,7 @@ public class JoyconManager: MonoBehaviour
 					}
 					IntPtr handle = HIDapi.hid_open_path (enumerate.path);
 					HIDapi.hid_set_nonblocking (handle, 1);
-					j.Add (new Joycon (handle, EnableIMU, EnableLocalize & EnableIMU, 0.05f, isLeft));
+					allJoyCons.Add (new Joycon (handle, EnableIMU, EnableLocalize & EnableIMU, 0.05f, isLeft));
 					++i;
 				}
 				ptr = enumerate.next;
@@ -74,10 +74,10 @@ public class JoyconManager: MonoBehaviour
 
     void Start()
     {
-		for (int i = 0; i < j.Count; ++i)
+		for (int i = 0; i < allJoyCons.Count; ++i)
 		{
 			Debug.Log (i);
-			Joycon jc = j [i];
+			Joycon jc = allJoyCons [i];
 			byte LEDs = 0x0;
 			LEDs |= (byte)(0x1 << i);
 			jc.Attach (leds_: LEDs);
@@ -87,17 +87,17 @@ public class JoyconManager: MonoBehaviour
 
     void Update()
     {
-		for (int i = 0; i < j.Count; ++i)
+		for (int i = 0; i < allJoyCons.Count; ++i)
 		{
-			j[i].Update();
+			allJoyCons[i].Update();
 		}
     }
 
     void OnApplicationQuit()
     {
-		for (int i = 0; i < j.Count; ++i)
+		for (int i = 0; i < allJoyCons.Count; ++i)
 		{
-			j[i].Detach ();
+			allJoyCons[i].Detach ();
 		}
     }
 }
